@@ -52,11 +52,11 @@ sem a necessidade de estimativas iniciais ou métodos iterativos tradicionais.
 
 | Nome              | Contribuição |
 |-------------------|-------------|
-| Igor Gabriel      | Implementação do modelo e análise dos resultados |
-| Breno             | Geração de dados e simulação |
-| Henrique Azevedo  | Treinamento das redes neurais |
-| João Marcos       | Avaliação e métricas |
-| João Coutinho     | Documentação e slides |
+| Igor Gabriel      |  |
+| Breno             |  |
+| Henrique Azevedo  | T |
+| João Marcos       |  |
+| João Coutinho     |  |
 
 ---
 
