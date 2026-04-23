@@ -41,7 +41,13 @@ def trap_equilibrium(theta_L, T, traps):
     total = 0
     for trap in traps:
         K = np.exp(-trap["E"] / (R * T))
-        theta_T = (theta_L * K) / (1 + (K - 1) * theta_L)
+        denominator = 1 + (K - 1) * theta_L
+
+        if abs(denominator) < 1e-10:
+            denominator = 1e-10
+
+        theta_T = (theta_L * K) / denominator
+        theta_T = np.clip(theta_T, 0, 1)
         total += trap["density"] * theta_T
     return total
 
@@ -65,12 +71,14 @@ def simulate_tds(traps):
 
         for i in range(1, Nx-1):
 
-            diffusion = D * (C_L[i+1] - 2*C_L[i] + C_L[i-1]) / dx**2
+            diffusion = D * (C_L[i+1] - 2*C_L[i] + C_L[i-1]) / (dx**2 + 1e-12)
 
             theta_L = C_L[i]
             trap_effect = trap_equilibrium(theta_L, T, traps)
 
             C_new[i] = C_L[i] + dt * (diffusion - 0.01 * trap_effect)
+            if np.isnan(C_new[i]) or np.isinf(C_new[i]):
+                C_new[i] = 0
 
         # Condições de contorno
         C_new[0] = 0
@@ -111,7 +119,12 @@ def resample_curve(T, flux, n_points=64):
 def preprocess(flux):
     flux = np.maximum(flux, 1e-10)
     flux = np.log(flux)
-    flux = (flux - np.mean(flux)) / np.std(flux)
+
+    std = np.std(flux)
+    if std < 1e-10:
+        std = 1e-10
+
+    flux = (flux - np.mean(flux)) / std
     return flux
 
 def format_output(n_traps, traps):
@@ -152,8 +165,12 @@ def generate_dataset(N):
 
         if i % 100 == 0:
             print(f"{i}/{N}")
+    X = np.array(X)
+    y_traps = np.array(y_traps)
+    y_E = np.array(y_E) / 120000
+    y_D = np.array(y_D)
 
-    return np.array(X), np.array(y_traps), np.array(y_E), np.array(y_D)
+    return X, y_traps, y_E, y_D
 
 # =========================
 # EXECUÇÃO
