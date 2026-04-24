@@ -1,91 +1,73 @@
-import numpy as np
-import matplotlib.pyplot as plt
+import argparse
 
- 
-R = 8.314   
+from train import train
+from evaluate import run_evaluation
 
- 
-D0 = 1e-7      
-EL = 40000      
 
- 
-T_min = 300      
-phi = 0.1       
+# ================================
+# Parser de argumentos
+# ================================
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Projeto TDS com Redes Neurais"
+    )
 
- 
-L = 1e-3         
-Nx = 50
-dx = L / Nx
+    parser.add_argument(
+        "--mode",
+        type=str,
+        default="train",
+        choices=["train", "eval", "full"],
+        help="Modo de execução: train | eval | full"
+    )
 
- 
-dt = 0.01
-Nt = 2000
+    parser.add_argument(
+        "--generate_data",
+        type=bool,
+        default=True,
+        help="Gerar novo dataset (True/False)"
+    )
 
- 
-C0 = 1.0
- 
-traps = [
-    {"E": 60000, "density": 0.5},
-    {"E": 90000, "density": 0.3}
-]
+    return parser.parse_args()
 
- 
-def temperature(t):
-    return T_min + phi * t
 
-def diffusion_coefficient(T):
-    return D0 * np.exp(-EL / (R * T))
+# ================================
+# Main
+# ================================
+def main():
+    args = parse_args()
 
-def trap_equilibrium(theta_L, T, traps):
-    total_trap = 0
-    for trap in traps:
-        K = np.exp(-trap["E"] / (R * T))
-        theta_T = (theta_L * K) / (1 + (K - 1) * theta_L)
-        total_trap += trap["density"] * theta_T
-    return total_trap
+    print("=== Projeto TDS ML ===")
+    print(f"Modo: {args.mode}")
 
- 
-x = np.linspace(0, L, Nx)
-C_L = np.ones(Nx) * C0
+    # ----------------------------
+    # MODO TREINO
+    # ----------------------------
+    if args.mode == "train":
+        print("\n[1] Treinando modelo...")
+        train(generate_new_data=args.generate_data)
 
-temperatures = []
-fluxes = []
+    # ----------------------------
+    # MODO AVALIAÇÃO
+    # ----------------------------
+    elif args.mode == "eval":
+        print("\n[2] Avaliando modelo...")
+        run_evaluation()
 
- 
-for step in range(Nt):
+    # ----------------------------
+    # MODO COMPLETO
+    # ----------------------------
+    elif args.mode == "full":
+        print("\n[1] Treinando modelo...")
+        train(generate_new_data=args.generate_data)
 
-    t = step * dt
-    T = temperature(t)
-    D = diffusion_coefficient(T)
+        print("\n[2] Avaliando modelo...")
+        run_evaluation()
 
-    C_new = C_L.copy()
+    print("\n=== Execução finalizada ===")
 
-    for i in range(1, Nx-1):
 
- 
-        diffusion = D * (C_L[i+1] - 2*C_L[i] + C_L[i-1]) / dx**2
-
-       
-        theta_L = C_L[i]
-        trap_effect = trap_equilibrium(theta_L, T, traps)
-
- 
-        C_new[i] = C_L[i] + dt * (diffusion - trap_effect * 0.01)
-
-    C_new[0] = 0
-    C_new[-1] = 0
-
-    C_L = C_new
-
-    flux = -D * (C_L[1] - C_L[0]) / dx
-
-    temperatures.append(T)
-    fluxes.append(flux)
-
-plt.figure(figsize=(8,5))
-plt.plot(temperatures, fluxes)
-plt.xlabel("Temperatura (K)")
-plt.ylabel("Fluxo de Hidrogênio")
-plt.title("Simulação TDS (simplificada)")
-plt.grid()
-plt.show()
+# ================================
+# Execução direta
+# ================================
+if __name__ == "__main__":
+    main()
