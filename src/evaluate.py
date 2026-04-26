@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from tensorflow.keras.models import load_model
 
-from dataset import load_dataset
+from src.dataset import load_dataset
 
 
 # ================================
@@ -101,7 +101,9 @@ def run_evaluation():
     X, y = load_dataset(DATA_PATH)
 
     print("Carregando modelo...")
-    model = load_model(MODEL_PATH)
+    from tensorflow.keras.models import load_model
+
+    model = load_model(MODEL_PATH, compile=False)
 
     # dividir (mesma lógica do treino)
     from sklearn.model_selection import train_test_split

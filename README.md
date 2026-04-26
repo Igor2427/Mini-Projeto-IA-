@@ -139,11 +139,12 @@ evaluate_model.py # Avaliação do modelo
 ## Integrantes e Contribuições
 | Nome              | Contribuição |
 |-------------------|-------------|
-| Igor Gabriel      | Evaluate + Train |
-| Breno             | k-fold |
-| Henrique Azevedo  | Main + Dataset |
-| João Marcos       | Pesquisa |
-| João Coutinho     | Slides |
+| Igor Gabriel      | Dataset     |
+| Guilherme Marques | Evaluate    |
+| Breno             | k-fold      |
+| Henrique Azevedo  | Main        |
+| João Marcos       | Requirements|
+| João Coutinho     | Train_model |
 ---
 ## Limitações
 
